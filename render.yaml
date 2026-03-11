@@ -1,0 +1,31 @@
+services:
+  # Web Service (Backend + Frontend)
+  - type: web
+    name: stock-trading-web
+    env: node
+    plan: free
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false  # You'll need to set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # You'll need to set this in Render dashboard
+      - key: JWT_EXPIRE
+        value: 7d
+
+  # MongoDB Service (Optional - if you want Render's managed MongoDB)
+  - type: pserv
+    name: stock-trading-mongo
+    env: docker
+    plan: free
+    repo: https://github.com/render-examples/mongo
+    envVars:
+      - key: MONGO_INITDB_ROOT_USERNAME
+        value: admin
+      - key: MONGO_INITDB_ROOT_PASSWORD
+        sync: false  # You'll need to set this in Render dashboard

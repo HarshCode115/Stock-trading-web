@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -26,7 +27,7 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://stock.hael.in'] 
+    ? [process.env.FRONTEND_URL || 'https://stock-trading-web.onrender.com'] 
     : ['http://localhost:3000'],
   credentials: true
 }));
@@ -50,6 +51,15 @@ app.use('/api/portfolio', require('./routes/portfolio'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/watchlist', require('./routes/watchlist'));
 app.use('/api/admin', require('./routes/admin'));
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  });
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
